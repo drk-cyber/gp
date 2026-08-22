@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能选股推荐</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;
+         background:#0f172a; color:#e2e8f0; padding:32px 20px; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { font-size:24px; margin-bottom:16px; }
+  .state { background:linear-gradient(135deg,#1e3a8a,#1e293b); border-radius:16px;
+           padding:20px; margin-bottom:20px; }
+  .state h2 { font-size:18px; margin-bottom:10px; color:#93c5fd; }
+  .chip { display:inline-block; background:#1e293b; border:1px solid #334155;
+          border-radius:20px; padding:4px 12px; font-size:12px; margin:4px 4px 0 0; }
+  .stats { display:flex; gap:16px; flex-wrap:wrap; margin-top:10px; font-size:13px; color:#cbd5e1; }
+  table { width:100%; border-collapse:collapse; font-size:13px; background:#1e293b;
+          border-radius:16px; overflow:hidden; }
+  th { text-align:left; color:#94a3b8; padding:12px 10px; background:#16213a; }
+  td { padding:10px; border-bottom:1px solid #1e293b; text-align:center; }
+  tr.risk td { border-bottom:1px solid #334155; }
+  .note { color:#64748b; font-size:12px; text-align:center; margin-top:16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>超跌反弹选股</h1>
+
+  <div class="state">
+    <h2>震荡市</h2>
+    <div><span class="chip">上证指数 3905.2 · 纠缠 · 5日-0.6%</span><span class="chip">深证成指 14094.17 · 纠缠 · 5日-1.8%</span><span class="chip">创业板指 3545.58 · 纠缠 · 5日-2.2%</span></div>
+    <div class="stats">
+      <span>上涨 2505 家</span>
+      <span>下跌 2861 家</span>
+      <span>涨停 60 家</span>
+      <span>跌停 20 家</span>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr>
+      <th>排名</th><th>代码</th><th>名称</th><th>现价</th><th>近5日跌幅</th><th>止盈位</th><th>止损位</th><th>得分</th><th style="text-align:left">理由</th>
+    </tr></thead>
+    <tbody><tr>
+                <td>1</td>
+                <td>301165</td>
+                <td style="font-weight:600">锐捷网络</td>
+                <td>126.97</td>
+                <td style="color:#0ea5e9">-11.8%</td>
+                <td style="color:#e11d48">137.13</td>
+                <td style="color:#0ea5e9">120.62</td>
+                <td style="font-weight:700;color:#f59e0b">81.5</td>
+                <td style="text-align:left">60日均线向上 + 近5日跌 -11.8%</td>
+            </tr>
+            <tr class="risk"><td></td><td colspan="8" style="color:#f87171;text-align:left">
+                风险：-</td></tr><tr>
+                <td>2</td>
+                <td>688146</td>
+                <td style="font-weight:600">中船特气</td>
+                <td>263.09</td>
+                <td style="color:#0ea5e9">-12.6%</td>
+                <td style="color:#e11d48">284.14</td>
+                <td style="color:#0ea5e9">249.94</td>
+                <td style="font-weight:700;color:#f59e0b">79.3</td>
+                <td style="text-align:left">60日均线向上 + 近5日跌 -12.6%</td>
+            </tr>
+            <tr class="risk"><td></td><td colspan="8" style="color:#f87171;text-align:left">
+                风险：-</td></tr><tr>
+                <td>3</td>
+                <td>300489</td>
+                <td style="font-weight:600">光智科技</td>
+                <td>216.55</td>
+                <td style="color:#0ea5e9">-14.1%</td>
+                <td style="color:#e11d48">233.87</td>
+                <td style="color:#0ea5e9">205.72</td>
+                <td style="font-weight:700;color:#f59e0b">78.9</td>
+                <td style="text-align:left">60日均线向上 + 近5日跌 -14.1%</td>
+            </tr>
+            <tr class="risk"><td></td><td colspan="8" style="color:#f87171;text-align:left">
+                风险：-</td></tr><tr>
+                <td>4</td>
+                <td>301526</td>
+                <td style="font-weight:600">国际复材</td>
+                <td>32.43</td>
+                <td style="color:#0ea5e9">-12.8%</td>
+                <td style="color:#e11d48">35.02</td>
+                <td style="color:#0ea5e9">30.81</td>
+                <td style="font-weight:700;color:#f59e0b">76.3</td>
+                <td style="text-align:left">60日均线向上 + 近5日跌 -12.8%</td>
+            </tr>
+            <tr class="risk"><td></td><td colspan="8" style="color:#f87171;text-align:left">
+                风险：-</td></tr><tr>
+                <td>5</td>
+                <td>000636</td>
+                <td style="font-weight:600">风华高科</td>
+                <td>54.67</td>
+                <td style="color:#0ea5e9">-12.8%</td>
+                <td style="color:#e11d48">59.04</td>
+                <td style="color:#0ea5e9">51.94</td>
+                <td style="font-weight:700;color:#f59e0b">74.4</td>
+                <td style="text-align:left">60日均线向上 + 近5日跌 -12.8%</td>
+            </tr>
+            <tr class="risk"><td></td><td colspan="8" style="color:#f87171;text-align:left">
+                风险：-</td></tr><tr>
+                <td>6</td>
+                <td>300209</td>
+                <td style="font-weight:600">行云科技</td>
+                <td>32.3</td>
+                <td style="color:#0ea5e9">-17.0%</td>
+                <td style="color:#e11d48">34.88</td>
+                <td style="color:#0ea5e9">30.68</td>
+                <td style="font-weight:700;color:#f59e0b">73.9</td>
+                <td style="text-align:left">60日均线向上 + 近5日跌 -17.0%</td>
+            </tr>
+            <tr class="risk"><td></td><td colspan="8" style="color:#f87171;text-align:left">
+                风险：-</td></tr><tr>
+                <td>7</td>
+                <td>301396</td>
+                <td style="font-weight:600">宏景科技</td>
+                <td>186.06</td>
+                <td style="color:#0ea5e9">-16.1%</td>
+                <td style="color:#e11d48">200.94</td>
+                <td style="color:#0ea5e9">176.76</td>
+                <td style="font-weight:700;color:#f59e0b">70.3</td>
+                <td style="text-align:left">60日均线向上 + 近5日跌 -16.1%</td>
+            </tr>
+            <tr class="risk"><td></td><td colspan="8" style="color:#f87171;text-align:left">
+                风险：-</td></tr><tr>
+                <td>8</td>
+                <td>688300</td>
+                <td style="font-weight:600">联瑞新材</td>
+                <td>145.31</td>
+                <td style="color:#0ea5e9">-11.8%</td>
+                <td style="color:#e11d48">156.93</td>
+                <td style="color:#0ea5e9">138.04</td>
+                <td style="font-weight:700;color:#f59e0b">70.3</td>
+                <td style="text-align:left">60日均线向上 + 近5日跌 -11.7%</td>
+            </tr>
+            <tr class="risk"><td></td><td colspan="8" style="color:#f87171;text-align:left">
+                风险：-</td></tr><tr>
+                <td>9</td>
+                <td>300017</td>
+                <td style="font-weight:600">网宿科技</td>
+                <td>15.54</td>
+                <td style="color:#0ea5e9">-10.3%</td>
+                <td style="color:#e11d48">16.78</td>
+                <td style="color:#0ea5e9">14.76</td>
+                <td style="font-weight:700;color:#f59e0b">70.1</td>
+                <td style="text-align:left">60日均线向上 + 近5日跌 -10.3%</td>
+            </tr>
+            <tr class="risk"><td></td><td colspan="8" style="color:#f87171;text-align:left">
+                风险：-</td></tr><tr>
+                <td>10</td>
+                <td>688017</td>
+                <td style="font-weight:600">绿的谐波</td>
+                <td>314.35</td>
+                <td style="color:#0ea5e9">-10.2%</td>
+                <td style="color:#e11d48">339.5</td>
+                <td style="color:#0ea5e9">298.63</td>
+                <td style="font-weight:700;color:#f59e0b">70.1</td>
+                <td style="text-align:left">60日均线向上 + 近5日跌 -10.2%</td>
+            </tr>
+            <tr class="risk"><td></td><td colspan="8" style="color:#f87171;text-align:left">
+                风险：-</td></tr></tbody>
+  </table>
+
+  <p class="note">推荐结果由本地量化模型自动生成，仅供参考，不构成投资建议。股市有风险，入市需谨慎。</p>
+</div>
+</body>
+</html>

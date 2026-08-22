@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>回测报告 - 航天电子 600879</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;
+         background:#0f172a; color:#e2e8f0; padding:32px 20px; }
+  .wrap { max-width:880px; margin:0 auto; }
+  h1 { font-size:24px; margin-bottom:4px; }
+  .sub { color:#94a3b8; font-size:14px; margin-bottom:20px; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px; }
+  .card { background:#1e293b; border-radius:12px; padding:16px; }
+  .card-label { color:#94a3b8; font-size:12px; margin-bottom:6px; }
+  .card-value { font-size:22px; font-weight:700; }
+  .section { background:#1e293b; border-radius:16px; padding:20px; margin-bottom:16px; }
+  .section h2 { font-size:16px; margin-bottom:12px; color:#cbd5e1; }
+  .vs { display:flex; gap:24px; margin-bottom:20px; font-size:14px; }
+  .vs .win { color:#10b981; font-weight:600; }
+  .vs .lose { color:#ef4444; font-weight:600; }
+  table.trades { width:100%; border-collapse:collapse; font-size:13px; }
+  table.trades th { text-align:left; color:#94a3b8; padding:8px; border-bottom:1px solid #334155; }
+  table.trades td { padding:8px; border-bottom:1px solid #1e293b; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>股票回测报告</h1>
+  <div class="sub">航天电子（600879）· 海龟：突破20日最高买入，跌破10日最低卖出 · 回测区间 2026-07-01 ~ 2026-08-21</div>
+
+  <div class="grid"><div class="card">
+            <div class="card-label">总收益率</div>
+            <div class="card-value" style="color:#e11d48">-9.42%</div>
+        </div><div class="card">
+            <div class="card-label">年化收益率</div>
+            <div class="card-value" style="color:#e11d48">-48.13%</div>
+        </div><div class="card">
+            <div class="card-label">最大回撤</div>
+            <div class="card-value" style="color:#0ea5e9">-9.42%</div>
+        </div><div class="card">
+            <div class="card-label">夏普比率</div>
+            <div class="card-value" style="color:#e11d48">-3.90</div>
+        </div><div class="card">
+            <div class="card-label">胜率</div>
+            <div class="card-value" style="color:#e11d48">0.00%</div>
+        </div><div class="card">
+            <div class="card-label">交易次数</div>
+            <div class="card-value" style="color:#e11d48">1</div>
+        </div></div>
+
+  <div class="section">
+    <h2>策略 vs 买入持有</h2>
+    <div class="vs">
+      <span>策略期末权益：<span class="win">90,576 元</span></span>
+      <span>买入持有期末：67,942 元</span>
+    </div>
+    <h2>资金曲线（红=策略 / 灰虚线=初始资金）</h2>
+    
+    <svg viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+      <polygon points="8,254 8.0,30.6 28.1,30.6 48.2,30.6 68.3,150.1 88.4,233.1 108.5,237.4 128.6,237.4 148.8,237.4 168.9,237.4 189.0,237.4 209.1,237.4 229.2,237.4 249.3,237.4 269.4,237.4 289.5,237.4 309.6,237.4 329.7,237.4 349.8,237.4 369.9,237.4 390.1,237.4 410.2,237.4 430.3,237.4 450.4,237.4 470.5,237.4 490.6,237.4 510.7,237.4 530.8,237.4 550.9,237.4 571.0,237.4 591.1,237.4 611.2,237.4 631.4,237.4 651.5,237.4 671.6,237.4 691.7,237.4 711.8,237.4 731.9,237.4 752.0,237.4 752.0,254" fill="#e11d48" opacity="0.10"/>
+      <line x1="8" y1="30.6" x2="752.0" y2="30.6" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,4"/>
+      <polyline points="8.0,30.6 28.1,30.6 48.2,30.6 68.3,150.1 88.4,233.1 108.5,237.4 128.6,237.4 148.8,237.4 168.9,237.4 189.0,237.4 209.1,237.4 229.2,237.4 249.3,237.4 269.4,237.4 289.5,237.4 309.6,237.4 329.7,237.4 349.8,237.4 369.9,237.4 390.1,237.4 410.2,237.4 430.3,237.4 450.4,237.4 470.5,237.4 490.6,237.4 510.7,237.4 530.8,237.4 550.9,237.4 571.0,237.4 591.1,237.4 611.2,237.4 631.4,237.4 651.5,237.4 671.6,237.4 691.7,237.4 711.8,237.4 731.9,237.4 752.0,237.4" fill="none" stroke="#e11d48" stroke-width="2"/>
+      <text x="8.0" y="274" font-size="11" fill="#64748b" text-anchor="middle">2026-07</text><text x="189.0" y="274" font-size="11" fill="#64748b" text-anchor="middle">2026-07</text><text x="369.9" y="274" font-size="11" fill="#64748b" text-anchor="middle">2026-07</text><text x="550.9" y="274" font-size="11" fill="#64748b" text-anchor="middle">2026-08</text><text x="752.0" y="274" font-size="11" fill="#64748b" text-anchor="middle">2026-08</text>
+    </svg>
+  </div>
+
+  <div class="section">
+    <h2>回撤曲线</h2>
+    
+    <svg viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+      <line x1="8.0" y1="10.0" x2="8.0" y2="10.0" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="28.1" y1="10.0" x2="28.1" y2="10.0" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="48.2" y1="10.0" x2="48.2" y2="10.0" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="68.3" y1="10.0" x2="68.3" y2="32.9" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="88.4" y1="10.0" x2="88.4" y2="48.8" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="108.5" y1="10.0" x2="108.5" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="128.6" y1="10.0" x2="128.6" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="148.8" y1="10.0" x2="148.8" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="168.9" y1="10.0" x2="168.9" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="189.0" y1="10.0" x2="189.0" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="209.1" y1="10.0" x2="209.1" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="229.2" y1="10.0" x2="229.2" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="249.3" y1="10.0" x2="249.3" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="269.4" y1="10.0" x2="269.4" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="289.5" y1="10.0" x2="289.5" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="309.6" y1="10.0" x2="309.6" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="329.7" y1="10.0" x2="329.7" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="349.8" y1="10.0" x2="349.8" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="369.9" y1="10.0" x2="369.9" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="390.1" y1="10.0" x2="390.1" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="410.2" y1="10.0" x2="410.2" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="430.3" y1="10.0" x2="430.3" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="450.4" y1="10.0" x2="450.4" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="470.5" y1="10.0" x2="470.5" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="490.6" y1="10.0" x2="490.6" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="510.7" y1="10.0" x2="510.7" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="530.8" y1="10.0" x2="530.8" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="550.9" y1="10.0" x2="550.9" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="571.0" y1="10.0" x2="571.0" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="591.1" y1="10.0" x2="591.1" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="611.2" y1="10.0" x2="611.2" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="631.4" y1="10.0" x2="631.4" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="651.5" y1="10.0" x2="651.5" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="671.6" y1="10.0" x2="671.6" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="691.7" y1="10.0" x2="691.7" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="711.8" y1="10.0" x2="711.8" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="731.9" y1="10.0" x2="731.9" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/><line x1="752.0" y1="10.0" x2="752.0" y2="49.6" stroke="#0ea5e9" stroke-width="1.5" opacity="0.7"/>
+      <text x="8.0" y="154" font-size="11" fill="#64748b" text-anchor="middle">2026-07</text><text x="189.0" y="154" font-size="11" fill="#64748b" text-anchor="middle">2026-07</text><text x="369.9" y="154" font-size="11" fill="#64748b" text-anchor="middle">2026-07</text><text x="550.9" y="154" font-size="11" fill="#64748b" text-anchor="middle">2026-08</text><text x="752.0" y="154" font-size="11" fill="#64748b" text-anchor="middle">2026-08</text>
+    </svg>
+  </div>
+
+  <div class="section">
+    <h2>交易明细</h2>
+    <table class="trades">
+        <thead><tr><th>日期</th><th>方向</th><th>价格</th><th>股数</th><th>金额</th><th>盈亏</th></tr></thead>
+        <tbody><tr>
+            <td>2026-07-06</td>
+            <td style="color:#e11d48;font-weight:600">买入</td>
+            <td>22.75</td>
+            <td>4300</td>
+            <td>97,825</td>
+            <td>-</td>
+        </tr><tr>
+            <td>2026-07-08</td>
+            <td style="color:#0ea5e9;font-weight:600">卖出</td>
+            <td>20.58</td>
+            <td>4300</td>
+            <td>88,494</td>
+            <td>-9,398</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <p style="color:#64748b;font-size:12px;text-align:center;margin-top:16px">
+    本报告由本地回测系统自动生成，回测结果不代表未来表现，仅供参考，不构成投资建议。
+  </p>
+</div>
+</body>
+</html>
