@@ -26,6 +26,10 @@ pip install -r requirements.txt
 
 ### 网页界面
 
+最省事的方式是双击项目目录下的 `start.bat`，脚本会自动启动服务并在几秒后打开浏览器；关闭那个黑色窗口即可停止服务。
+
+也可以手动启动：
+
 ```bash
 python webapp.py
 ```
@@ -162,6 +166,7 @@ python main.py --recommend --mode dip120        # 超跌反弹（120日半年线
 gp/
 ├── main.py             # 命令行入口
 ├── webapp.py           # Web 入口（Flask）
+├── start.bat           # 一键启动脚本（双击启动网页版）
 ├── config.py           # 配置：交易成本、默认参数
 ├── requirements.txt    # 依赖清单
 ├── data/               # 数据获取与本地缓存
