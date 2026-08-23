@@ -2,15 +2,13 @@
 title A-share Backtest System
 cd /d C:\gp
 
-echo ==========================================
-echo    A-share Backtest System
-echo ==========================================
-echo.
+set "PY=C:\Users\24331\AppData\Local\Programs\Python\Python311\python.exe"
 
-python --version >nul 2>&1
-if errorlevel 1 (
-    echo [Error] Python not found. Please install Python 3.10+
+if not exist "%PY%" (
+    echo [Error] Python not found:
+    echo   %PY%
     echo.
+    echo Please install dependencies and run: python webapp.py
     pause
     exit /b 1
 )
@@ -22,7 +20,7 @@ echo.
 
 start "" cmd /c "timeout /t 4 /nobreak >nul & start http://127.0.0.1:8000"
 
-python webapp.py
+"%PY%" webapp.py
 
 echo.
 echo Server stopped.
