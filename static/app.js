@@ -106,80 +106,136 @@
     }, 1200);
   }
 
+  // 市场状态面板：温度计 + 宽度统计 + 指数行情
+  function marketPanel(m) {
+    const b = (m && m.breadth) || {};
+    const up = Number(b["上涨"] || 0);
+    const down = Number(b["下跌"] || 0);
+    const total = up + down;
+    const upW = total > 0 ? (up / total * 100).toFixed(1) : "50";
+
+    const chips = (m.index_trend || [])
+      .filter((i) => i.close !== null)
+      .map((i) => {
+        const c = i.chg5d == null ? "" : "ix-chg " + (i.chg5d >= 0 ? "pos" : "neg");
+        const chg = i.chg5d == null ? "" : " 5日" + fmtPct(i.chg5d);
+        return `<span class="index-chip">
+          <span class="ix-name">${escapeHtml(i.name)}</span>
+          <span class="ix-close">${i.close}</span>
+          <span class="${c}">${escapeHtml(chg)}</span>
+        </span>`;
+      })
+      .join("");
+
+    return `<div class="panel market">
+      <div class="panel-head">
+        <span class="panel-title">市场状态</span>
+        <span class="panel-hint">红为上涨家数 · 绿为下跌家数</span>
+      </div>
+      <div class="panel-body">
+        <div class="market-state-row">
+          <div class="market-state"><span class="dot"></span>${escapeHtml((m && m.state) || "未知")}</div>
+        </div>
+        <div class="thermo">
+          <div class="seg up" data-w="${upW}%"></div>
+          <div class="seg down" data-w="${total > 0 ? (100 - upW).toFixed(1) : 50}%"></div>
+        </div>
+        <div class="thermo-legend">
+          <span class="lk-up">上涨<b>${up}</b></span>
+          <span class="lk-down">下跌<b>${down}</b></span>
+          <span>涨停<b>${b["涨停"] ?? 0}</b></span>
+          <span>跌停<b>${b["跌停"] ?? 0}</b></span>
+        </div>
+        ${chips ? `<div class="index-row">${chips}</div>` : ""}
+      </div>
+    </div>`;
+  }
+
+  function scoreCell(score) {
+    const s = Number(score);
+    if (!isFinite(s)) return `<td class="r">-</td>`;
+    const w = Math.max(0, Math.min(100, s));
+    return `<td class="r"><span class="score-cell">
+      <span class="score-num">${score}</span>
+      <span class="scorebar"><i style="width:${w}%"></i></span>
+    </span></td>`;
+  }
+
+  function reasonCell(r) {
+    const reasons = (r.reasons || []).slice(0, 5).join(" · ");
+    const risks = (r.risks || []).slice(0, 3).join("、");
+    return `<td><span class="reason">${escapeHtml(reasons || "-")}</span>` +
+      (risks ? `<span class="risk">风险提示：${escapeHtml(risks)}</span>` : "") +
+      `</td>`;
+  }
+
   function renderRecommend(result) {
     if (!result || !result.recommendations || !result.recommendations.length) {
       recResult.classList.remove("hidden");
-      recResult.innerHTML = '<p class="empty">未筛选出符合条件的股票。</p>';
+      recResult.innerHTML = '<p class="empty">本次扫描未筛选出符合条件的股票，换个模式或稍后再试。</p>';
       return;
     }
 
     const m = result.market || {};
-    const b = m.breadth || {};
-    const idx = (m.index_trend || [])
-      .filter((i) => i.close !== null)
-      .map((i) => `${i.name} ${i.close} · ${i.trend} · 5日${fmtPct(i.chg5d)}`)
-      .join("　");
     const isDip = result.recommendations[0] && result.recommendations[0].take_profit !== undefined;
 
     let rows = "";
     result.recommendations.forEach((r, i) => {
-      const reasons = (r.reasons || []).slice(0, 5).join(" · ");
-      const risks = (r.risks || []).slice(0, 3).join("、");
+      const rank = `<td class="mono">${String(i + 1).padStart(2, "0")}</td>`;
+      const code = `<td class="mono stock-code">${r.code}</td>`;
+      const name = `<td class="stock-name">${escapeHtml(r.name)}</td>`;
+      const price = `<td class="r mono">${r.price !== null && r.price !== undefined ? r.price : "-"}</td>`;
       if (isDip) {
         const dip = r.dip_pct != null ? (r.dip_pct > 0 ? "+" : "") + r.dip_pct.toFixed(1) + "%" : "-";
         rows += `<tr>
-          <td class="mono">${i + 1}</td>
-          <td class="mono">${r.code}</td>
-          <td><b>${escapeHtml(r.name)}</b></td>
-          <td class="mono">${r.price !== null ? r.price : "-"}</td>
-          <td class="mono down">${dip}</td>
-          <td class="mono up">${r.take_profit}</td>
-          <td class="mono down">${r.stop_loss}</td>
-          <td class="score mono">${r.score}</td>
-          <td><span class="reason">${escapeHtml(reasons || "-")}</span>${risks ? '<br><span class="risk">风险：' + escapeHtml(risks) + "</span>" : ""}</td>
+          ${rank}${code}${name}${price}
+          <td class="r mono down">${dip}</td>
+          <td class="r mono up">${r.take_profit}</td>
+          <td class="r mono down">${r.stop_loss}</td>
+          ${scoreCell(r.score)}
+          ${reasonCell(r)}
         </tr>`;
       } else {
         const pe = r.pe !== null && r.pe !== undefined ? r.pe.toFixed(1) : "-";
         rows += `<tr>
-          <td class="mono">${i + 1}</td>
-          <td class="mono">${r.code}</td>
-          <td><b>${escapeHtml(r.name)}</b></td>
-          <td class="mono">${r.price !== null ? r.price : "-"}</td>
-          <td class="mono ${cls(r.pct_chg)}">${fmtPct(r.pct_chg)}</td>
-          <td class="mono">${pe}</td>
-          <td class="score mono">${r.score}</td>
-          <td><span class="reason">${escapeHtml(reasons || "-")}</span>${risks ? '<br><span class="risk">风险：' + escapeHtml(risks) + "</span>" : ""}</td>
+          ${rank}${code}${name}${price}
+          <td class="r mono ${cls(r.pct_chg)}">${fmtPct(r.pct_chg)}</td>
+          <td class="r mono">${pe}</td>
+          ${scoreCell(r.score)}
+          ${reasonCell(r)}
         </tr>`;
       }
     });
 
+    const thead = isDip
+      ? '<th>排名</th><th>代码</th><th>名称</th><th class="r">现价</th><th class="r">近5日跌幅</th><th class="r">止盈位</th><th class="r">止损位</th><th class="r">得分</th><th>理由</th>'
+      : '<th>排名</th><th>代码</th><th>名称</th><th class="r">现价</th><th class="r">涨跌幅</th><th class="r">PE</th><th class="r">得分</th><th>推荐理由</th>';
+
     let reportLink = "";
     if (result.report_url) {
-      reportLink = `<p style="margin-top:16px"><a class="report-open" href="${result.report_url}" target="_blank">打开完整推荐报告 →</a></p>`;
+      reportLink = `<p class="report-link-row"><a class="report-open" href="${result.report_url}" target="_blank">打开完整推荐报告 →</a></p>`;
     }
 
-    const thead = isDip
-      ? '<th>排名</th><th>代码</th><th>名称</th><th>现价</th><th>近5日跌幅</th><th>止盈位</th><th>止损位</th><th>得分</th><th>理由</th>'
-      : '<th>排名</th><th>代码</th><th>名称</th><th>现价</th><th>涨跌幅</th><th>PE</th><th>得分</th><th>推荐理由</th>';
-
     recResult.innerHTML = `
-      <div class="market">
-        <div class="market-state"><span class="dot"></span>${escapeHtml(m.state || "未知")}</div>
-        <div class="market-stats">
-          <span>上涨 <b>${b["上涨"] ?? 0}</b></span>
-          <span>下跌 <b>${b["下跌"] ?? 0}</b></span>
-          <span>涨停 <b>${b["涨停"] ?? 0}</b></span>
-          <span>跌停 <b>${b["跌停"] ?? 0}</b></span>
-        </div>
-        ${idx ? `<div class="market-stats" style="margin-top:8px">${escapeHtml(idx)}</div>` : ""}
-      </div>
-      <table>
-        <thead><tr>${thead}</tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
+      ${marketPanel(m)}
+      <div class="table-wrap"><div class="table-scroll">
+        <table>
+          <thead><tr>${thead}</tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div></div>
       ${reportLink}
     `;
     recResult.classList.remove("hidden");
+
+    // 温度计入场动画：先渲染 0 宽，再过渡到目标宽度
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        recResult.querySelectorAll(".thermo .seg").forEach((el) => {
+          el.style.width = el.dataset.w;
+        });
+      });
+    });
   }
 
   // ---------- 策略回测 ----------
@@ -232,21 +288,26 @@
       const v = m[k] ?? "-";
       let color = "var(--text)";
       if (k === "总收益率" || k === "年化收益率") {
-        color = v.startsWith("-") ? "var(--down)" : "var(--up)";
+        color = String(v).startsWith("-") ? "var(--down)" : "var(--up)";
       } else if (k === "最大回撤") {
         color = "var(--down)";
       }
       cards += `<div class="metric">
         <div class="metric-label">${k}</div>
-        <div class="metric-value" style="color:${color}">${v}</div>
+        <div class="metric-value" style="color:${color}">${escapeHtml(String(v))}</div>
       </div>`;
     });
 
     btResult.innerHTML = `
-      <h2>${escapeHtml(data.name || data.code)}（${data.code}）</h2>
-      <p class="view-desc" style="margin-bottom:14px">${escapeHtml(data.strategy_desc || "")} · 共 ${data.days ?? 0} 个交易日</p>
+      <div class="result-lead">
+        <span class="result-title">${escapeHtml(data.name || data.code)}</span>
+        <span class="result-sub mono">${data.code} · 共 ${data.days ?? 0} 个交易日</span>
+      </div>
+      <p class="view-desc" style="margin-bottom:14px">${escapeHtml(data.strategy_desc || "")}</p>
       <div class="metrics">${cards}</div>
-      <p style="margin-top:16px"><a class="report-open" href="${data.report_url}" target="_blank">打开完整回测报告 →</a></p>
+      ${data.report_url
+        ? `<p class="report-link-row"><a class="report-open" href="${data.report_url}" target="_blank">打开完整回测报告 →</a></p>`
+        : ""}
     `;
     btResult.classList.remove("hidden");
   }
@@ -258,7 +319,7 @@
       const res = await fetch("/api/reports");
       const list = await res.json();
       if (!list.length) {
-        box.innerHTML = '<p class="empty">暂无报告，先运行一次回测或推荐。</p>';
+        box.innerHTML = '<p class="empty">暂无报告 — 运行一次回测或选股扫描后，报告会归档在这里。</p>';
         return;
       }
       box.innerHTML = list.map((r) => `
@@ -266,8 +327,8 @@
           <div class="report-meta">
             <span class="report-tag ${r.type === "回测" ? "bt" : ""}">${r.type}</span>
             <span class="report-name">${escapeHtml(r.filename)}</span>
-            <span class="report-time">${r.mtime}</span>
           </div>
+          <span class="report-time">${r.mtime}</span>
           <a class="report-open" href="${r.url}" target="_blank">查看 →</a>
         </div>
       `).join("");

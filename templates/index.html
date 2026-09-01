@@ -11,12 +11,22 @@
     <!-- 侧边导航 -->
     <aside class="sidebar">
       <div class="brand">
-        <span class="brand-mark"></span>
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <line x1="6"  y1="4"  x2="6"  y2="20" stroke="currentColor" data-c="down"/>
+            <rect x="4"   y="9"  width="4"  height="7" data-c="down"/>
+            <line x1="12" y1="3"  x2="12" y2="19" stroke="currentColor" data-c="accent"/>
+            <rect x="10"  y="6"  width="4"  height="8" data-c="accent"/>
+            <line x1="18" y1="5"  x2="18" y2="21" stroke="currentColor" data-c="up"/>
+            <rect x="16"  y="7"  width="4"  height="9" data-c="up"/>
+          </svg>
+        </span>
         <div>
           <div class="brand-name">A股回测</div>
-          <div class="brand-sub">Backtest Studio</div>
+          <div class="brand-sub">QUANT TERMINAL</div>
         </div>
       </div>
+
       <nav class="nav">
         <button class="nav-item active" data-view="recommend">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
@@ -31,7 +41,11 @@
           报告
         </button>
       </nav>
-      <div class="sidebar-footer">本地运行 · 数据源 AkShare</div>
+
+      <div class="sidebar-footer">
+        <div class="conn"><span class="conn-dot"></span>本地运行</div>
+        <div class="conn-sub">数据源 AkShare</div>
+      </div>
     </aside>
 
     <!-- 主工作区 -->
@@ -40,33 +54,42 @@
       <!-- 选股推荐 -->
       <section class="view active" id="view-recommend">
         <header class="view-header">
+          <div class="eyebrow">SCREENER</div>
           <h1>选股推荐</h1>
-          <p class="view-desc">扫描全市场，多维度打分，输出当前行情的推荐股票。</p>
+          <p class="view-desc">扫描全市场，多维度打分，输出当前行情下的推荐股票。</p>
         </header>
 
-        <div class="controls">
-          <label class="field">
-            <span>推荐模式</span>
-            <select id="rec-mode">
-              <option value="general">综合推荐</option>
-              <option value="dip">超跌反弹 · 60日线</option>
-              <option value="dip120">超跌反弹 · 120日半年线</option>
-            </select>
-          </label>
-          <label class="field">
-            <span>推荐数量</span>
-            <input id="rec-top" type="number" value="10" min="1" max="50">
-          </label>
-          <label class="field">
-            <span>推荐风格</span>
-            <select id="rec-style">
-              <option value="">自动判断</option>
-              <option value="aggressive">进攻型</option>
-              <option value="defensive">防守型</option>
-              <option value="balanced">均衡型</option>
-            </select>
-          </label>
-          <button id="rec-btn" class="btn-primary">开始扫描</button>
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">扫描参数</span>
+            <span class="panel-hint">综合推荐会先判断大盘状态，再决定打分风格</span>
+          </div>
+          <div class="panel-body">
+            <div class="controls">
+              <label class="field">
+                <span>推荐模式</span>
+                <select id="rec-mode">
+                  <option value="general">综合推荐</option>
+                  <option value="dip">超跌反弹 · 60日线</option>
+                  <option value="dip120">超跌反弹 · 120日半年线</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>推荐数量</span>
+                <input id="rec-top" type="number" value="10" min="1" max="50">
+              </label>
+              <label class="field">
+                <span>推荐风格</span>
+                <select id="rec-style">
+                  <option value="">自动判断</option>
+                  <option value="aggressive">进攻型</option>
+                  <option value="defensive">防守型</option>
+                  <option value="balanced">均衡型</option>
+                </select>
+              </label>
+              <button id="rec-btn" class="btn-primary">开始扫描</button>
+            </div>
+          </div>
         </div>
 
         <div id="rec-status" class="status hidden"></div>
@@ -76,33 +99,44 @@
       <!-- 策略回测 -->
       <section class="view" id="view-backtest">
         <header class="view-header">
+          <div class="eyebrow">BACKTEST</div>
           <h1>策略回测</h1>
-          <p class="view-desc">选择策略与股票，模拟 A股真实交易规则（T+1、涨跌停、手续费）验证历史表现。</p>
+          <p class="view-desc">选择策略与股票，按 A股真实交易规则（T+1、涨跌停、手续费）验证历史表现。</p>
         </header>
 
-        <div class="form-grid">
-          <label class="field">
-            <span>策略</span>
-            <select id="bt-strategy"></select>
-          </label>
-          <label class="field">
-            <span>股票代码</span>
-            <input id="bt-code" placeholder="如 600519">
-          </label>
-          <label class="field">
-            <span>起始日期</span>
-            <input id="bt-start" type="date">
-          </label>
-          <label class="field">
-            <span>结束日期</span>
-            <input id="bt-end" type="date">
-          </label>
-          <label class="field">
-            <span>初始资金</span>
-            <input id="bt-cash" type="number" value="100000" step="10000">
-          </label>
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">回测参数</span>
+            <span class="panel-hint">日期留空则取全部可用历史</span>
+          </div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <label class="field">
+                <span>策略</span>
+                <select id="bt-strategy"></select>
+              </label>
+              <label class="field">
+                <span>股票代码</span>
+                <input id="bt-code" placeholder="如 600519" inputmode="numeric">
+              </label>
+              <label class="field">
+                <span>起始日期</span>
+                <input id="bt-start" type="date">
+              </label>
+              <label class="field">
+                <span>结束日期</span>
+                <input id="bt-end" type="date">
+              </label>
+              <label class="field">
+                <span>初始资金</span>
+                <input id="bt-cash" type="number" value="100000" step="10000">
+              </label>
+            </div>
+            <div class="form-actions">
+              <button id="bt-btn" class="btn-primary">运行回测</button>
+            </div>
+          </div>
         </div>
-        <button id="bt-btn" class="btn-primary">运行回测</button>
 
         <div id="bt-status" class="status hidden"></div>
         <div id="bt-result" class="result hidden"></div>
@@ -111,11 +145,18 @@
       <!-- 报告 -->
       <section class="view" id="view-reports">
         <header class="view-header">
+          <div class="eyebrow">ARCHIVE</div>
           <h1>报告</h1>
           <p class="view-desc">历史生成的回测与推荐报告，点击在新窗口查看。</p>
         </header>
-        <button id="reports-refresh" class="btn-ghost">刷新列表</button>
-        <div id="reports-list"></div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">报告归档</span>
+            <button id="reports-refresh" class="btn-ghost">刷新列表</button>
+          </div>
+          <div id="reports-list" class="reports-list"></div>
+        </div>
       </section>
 
     </main>

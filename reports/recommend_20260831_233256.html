@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>超跌反弹选股（60日均线）</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:"PingFang SC","Microsoft YaHei UI","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+    background:#0b0c0e; color:#eae5d9; padding:36px 22px 48px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:920px; margin:0 auto; }
+  .eyebrow {
+    font-family:Consolas, 'Cascadia Mono', 'SF Mono', Menlo, monospace; font-size:11px; letter-spacing:3px;
+    color:#e8b33c; margin-bottom:8px;
+  }
+  h1 { font-size:24px; font-weight:700; margin-bottom:6px; }
+  .sub { color:#a29d90; font-size:13.5px; margin-bottom:26px; line-height:1.6; }
+  .panel {
+    background:#14161a; border:1px solid #24272d; border-radius:12px;
+    margin-bottom:16px; overflow:hidden;
+  }
+  .panel-head {
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:13px 20px; border-bottom:1px solid #24272d;
+  }
+  .panel-head h2 { font-size:13.5px; font-weight:600; }
+  .panel-head .hint { font-size:12px; color:#6a675f; }
+  .panel-body { padding:18px 20px; }
+  .mono { font-family:Consolas, 'Cascadia Mono', 'SF Mono', Menlo, monospace; font-variant-numeric:tabular-nums; }
+  .up { color:#ef5350; }
+  .down { color:#22b573; }
+  footer {
+    color:#6a675f; font-size:12px; text-align:center; margin-top:20px; line-height:1.7;
+  }
+
+  .thermo { display:flex; height:8px; border-radius:4px; background:#1b1e23;
+            overflow:hidden; margin-bottom:10px; }
+  .thermo .seg-up { background:#ef5350; }
+  .thermo .seg-down { background:#22b573; }
+  .tlegend { display:flex; gap:20px; flex-wrap:wrap; font-size:12.5px; color:#a29d90; margin-bottom:14px; }
+  .tlegend b { font-family:Consolas, 'Cascadia Mono', 'SF Mono', Menlo, monospace; font-variant-numeric:tabular-nums; margin-left:4px; }
+  .tlegend .lk-up { color:#ef5350; }
+  .tlegend .lk-down { color:#22b573; }
+  .chip { display:inline-flex; align-items:baseline; gap:8px; padding:7px 12px;
+          border-radius:8px; background:#1b1e23; border:1px solid #24272d;
+          font-size:12.5px; margin:0 8px 8px 0; }
+  .chip .ix-name { color:#a29d90; }
+  .chip .ix-close { font-weight:600; }
+  .state-row { display:flex; align-items:center; gap:8px; font-size:15px; font-weight:650; margin-bottom:14px; }
+  .state-row .dot { width:8px; height:8px; border-radius:50%; background:#e8b33c;
+                    box-shadow:0 0 0 3px rgba(232,179,60,.15); }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { color:#6a675f; font-weight:500; padding:11px 10px; font-size:12px;
+       background:#101216; white-space:nowrap; }
+  th.r { text-align:right; }
+  td { padding:10px; border-bottom:1px solid #1d2025; text-align:center; }
+  td.r { text-align:right; }
+  tr:hover td { background:#1b1e23; }
+  tbody tr:last-child td { border-bottom:none; }
+  .tablewrap { border:1px solid #24272d; border-radius:12px; overflow:hidden;
+               background:#14161a; margin-bottom:16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">SCREENER REPORT</div>
+  <h1>超跌反弹选股（60日均线）</h1>
+  <div class="sub">生成于 2026-08-31 23:32 · 共 1 只</div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>市场状态</h2><span class="hint">红为上涨家数 · 绿为下跌家数</span></div>
+    <div class="panel-body">
+      <div class="state-row"><span class="dot"></span>熊市（偏空）</div>
+      <div class="thermo">
+        <div class="seg-up" style="width:58.9%"></div>
+        <div class="seg-down" style="width:41.1%"></div>
+      </div>
+      <div class="tlegend">
+        <span class="lk-up">上涨<b>3181</b></span>
+        <span class="lk-down">下跌<b>2218</b></span>
+        <span>涨停<b>92</b></span>
+        <span>跌停<b>16</b></span>
+      </div>
+      <span class="chip"><span class="ix-name">上证指数</span><span class="mono ix-close">3986.3</span><span class="mono up">5日+2.7%</span></span><span class="chip"><span class="ix-name">深证成指</span><span class="mono ix-close">14015.0</span><span class="mono up">5日+1.6%</span></span><span class="chip"><span class="ix-name">创业板指</span><span class="mono ix-close">3438.68</span><span class="mono up">5日+0.2%</span></span>
+    </div>
+  </div>
+
+  <div class="tablewrap">
+  <table>
+    <thead><tr>
+      <th>排名</th><th>代码</th><th>名称</th><th class="r">现价</th><th class="r">近5日跌幅</th><th class="r">止盈位</th><th class="r">止损位</th><th class="r">得分</th><th style="text-align:left">理由</th>
+    </tr></thead>
+    <tbody><tr>
+                <td class="mono">01</td>
+                <td class="mono" style="color:#6a675f">300139</td>
+                <td style="font-weight:600;white-space:nowrap">晓程科技</td>
+                <td class="mono r">52.13</td>
+                <td class="mono r down">-10.6%</td>
+                <td class="mono r up">56.3</td>
+                <td class="mono r down">49.52</td>
+                <td class="mono r" style="font-weight:650;color:#e8b33c">74.4</td>
+                <td style="text-align:left">60日均线向上 + 近5日跌 -10.6%<br>
+                    <span style="color:#d98a3f;font-size:12px">风险：-</span></td>
+            </tr></tbody>
+  </table>
+  </div>
+
+  <footer>
+    推荐结果由本地量化模型自动生成 · 2026-08-31 23:32<br>
+    仅供参考，不构成投资建议。股市有风险，入市需谨慎。
+  </footer>
+</div>
+</body>
+</html>
