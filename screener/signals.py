@@ -18,7 +18,13 @@ def detect_signals(df):
     if df is None or len(df) < 60:
         return []
 
-    d = ind.add_indicators(df)
+    d = ind.add_indicators(df).replace([np.inf, -np.inf], np.nan)
+    required = ["open", "high", "low", "close", "volume"]
+    if any(c not in d.columns for c in required):
+        return []
+    d = d.dropna(subset=required).reset_index(drop=True)
+    if len(d) < 60:
+        return []
     signals = []
     close = d["close"]
     last = len(d) - 1
@@ -37,14 +43,16 @@ def detect_signals(df):
 
     # 2. MACD 金叉/死叉（近5日内）
     dif, dea = d["dif"], d["dea"]
-    recent_golden = crossover(dif, dea).iloc[-6:]
-    recent_dead = crossunder(dif, dea).iloc[-6:]
-    if recent_golden.any():
+    golden = crossover(dif, dea).iloc[-6:]
+    dead = crossunder(dif, dea).iloc[-6:]
+    golden_i = golden[golden].index.max() if golden.any() else -1
+    dead_i = dead[dead].index.max() if dead.any() else -1
+    if golden_i > dead_i:
         signals.append({
             "name": "MACD金叉", "direction": "bullish", "strength": 0.8,
             "description": "MACD的DIF线上穿DEA线，短期看涨信号",
         })
-    if recent_dead.any():
+    if dead_i > golden_i:
         signals.append({
             "name": "MACD死叉", "direction": "bearish", "strength": 0.6,
             "description": "MACD的DIF线下穿DEA线，短期看跌信号",
@@ -87,7 +95,7 @@ def detect_signals(df):
         })
 
     # 7. 底背离（价格创新低，MACD未创新低）
-    low20 = d["low"].rolling(20).min()
+    low20 = d["low"].rolling(20).min().shift(1)
     if (close.iloc[last] <= low20.iloc[last] and
             d["macd"].iloc[last] > d["macd"].iloc[-20:].min()):
         signals.append({

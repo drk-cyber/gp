@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能选股推荐</title>
+<style id="report-theme-v2">
+  :root {
+    color-scheme:dark;
+    --bg:#0b1020; --bg-raise:#0f1629; --surface:#141d32; --surface-2:#1b2740;
+    --border:#29364e; --text:#edf2ff; --text-2:#b4c0d8; --text-3:#91a1be;
+    --accent:#91a4ff; --accent-strong:#b2bdff; --up:#ff7f8c; --down:#42d6a4;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family:"Microsoft YaHei UI","PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+    background:radial-gradient(ellipse at 85% 0,rgba(114,136,247,.08),transparent 46%),var(--bg);
+    color:var(--text); padding:0 28px 36px; font-size:14px; line-height:1.6;
+    -webkit-font-smoothing:antialiased; min-width:320px;
+  }
+  ::selection { background:rgba(145,164,255,.28); color:var(--text); }
+  .wrap,.report-tools { max-width:1360px; margin:0 auto; }
+  .wrap { padding-top:25px; }
+  .report-tools {
+    display:flex; align-items:center; justify-content:space-between; gap:20px;
+    min-height:70px; border-bottom:1px solid var(--border);
+    position:sticky; top:0; z-index:10; background:rgba(11,16,32,.94); backdrop-filter:blur(12px);
+  }
+  .report-brand { display:flex; align-items:center; gap:10px; font-size:13px; font-weight:650; letter-spacing:.3px; }
+  .report-brand-mark {
+    display:grid; place-items:center; width:32px; height:32px; border-radius:10px;
+    background:var(--surface-2); border:1px solid #3a4970; color:var(--accent-strong);
+  }
+  .report-brand small { color:var(--text-3); font-size:12px; font-weight:400; margin-left:6px; }
+  .report-actions { display:flex; align-items:center; gap:10px; }
+  .report-action {
+    display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:38px;
+    border:1px solid var(--border); border-radius:10px; padding:0 13px;
+    background:var(--surface); color:var(--text-2); font:inherit; font-size:12px;
+    text-decoration:none; cursor:pointer; transition:background .16s ease,border-color .16s ease;
+  }
+  .report-action:hover { background:var(--surface-2); border-color:#576899; color:var(--text); }
+  .report-action-primary { background:#7288f7; border-color:#7288f7; color:#0b1020; font-weight:650; }
+  .report-action-primary:hover { background:#91a4ff; border-color:#91a4ff; color:#0b1020; }
+  :focus-visible { outline:2px solid var(--accent-strong); outline-offset:4px; }
+  .eyebrow {
+    font-family:Bahnschrift, Consolas, 'Cascadia Mono', 'SF Mono', Menlo, monospace; font-size:11px; letter-spacing:2px;
+    color:var(--accent); margin-bottom:6px;
+  }
+  h1 { font-size:27px; line-height:1.35; font-weight:700; letter-spacing:-.6px; margin-bottom:8px; }
+  .sub { color:var(--text-3); font-size:12px; margin-bottom:22px; line-height:1.8; }
+  .panel,.section,.state,.tablewrap {
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    margin-bottom:14px; overflow:hidden; box-shadow:0 8px 26px rgba(0,0,0,.12);
+    min-width:0;
+  }
+  .section,.state { padding:18px 20px; }
+  .panel-head {
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:13px 18px; border-bottom:1px solid var(--border); min-height:49px;
+  }
+  .panel-head h2,.section h2 { color:var(--text); font-size:14px; font-weight:650; }
+  .section h2 { margin-bottom:12px; }
+  .panel-head .hint { font-size:12px; color:var(--text-3); font-weight:400; }
+  .panel-body { padding:16px 18px; min-width:0; }
+  .mono { font-family:Bahnschrift, Consolas, 'Cascadia Mono', 'SF Mono', Menlo, monospace; font-variant-numeric:tabular-nums; }
+  .up,.vs .win { color:var(--up); }
+  .down,.vs .lose { color:var(--down); }
+  .grid { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:10px; margin-bottom:16px; background:none; border:0; border-radius:0; overflow:visible; }
+  .metric,.card {
+    padding:16px; background:linear-gradient(145deg,rgba(145,164,255,.035),transparent 70%),var(--surface);
+    border:1px solid var(--border); border-radius:14px; min-width:0; box-shadow:0 5px 18px rgba(0,0,0,.1);
+  }
+  .grid .metric { border:1px solid var(--border); }
+  .metric-label,.card-label { color:var(--text-3); font-size:12px; margin-bottom:7px; }
+  .metric-value,.card-value { font-family:Bahnschrift, Consolas, 'Cascadia Mono', 'SF Mono', Menlo, monospace; font-size:25px; line-height:1.25; font-weight:600; font-variant-numeric:tabular-nums; letter-spacing:-.6px; }
+  .vs { display:flex; gap:12px 24px; flex-wrap:wrap; font-size:12px; color:var(--text-2); margin-bottom:15px; }
+  .vs b,.vs .win,.vs .lose { font-family:Bahnschrift, Consolas, 'Cascadia Mono', 'SF Mono', Menlo, monospace; font-variant-numeric:tabular-nums; font-weight:600; font-size:15px; }
+  .legend { display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--text-3); margin-bottom:10px; }
+  .legend .k { display:inline-flex; align-items:center; gap:6px; }
+  .legend .swatch { width:18px; height:3px; border-radius:2px; display:inline-block; }
+  .wrap svg { display:block; max-width:100%; overflow:visible; }
+  .report-table-scroll { overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:thin; scrollbar-color:#445578 var(--bg-raise); }
+  .wrap > .report-table-scroll { border:1px solid var(--border); border-radius:16px; }
+  table,table.trades { width:100%; border-collapse:collapse; font-size:13px; line-height:1.65; background:var(--surface); }
+  th,table.trades th { color:var(--text-3); font-size:12px; font-weight:500; padding:11px 12px; background:var(--bg-raise); white-space:nowrap; border-bottom:1px solid var(--border); }
+  td,table.trades td { padding:11px 12px; border-bottom:1px solid var(--border); text-align:center; vertical-align:top; }
+  table.trades th,table.trades td { text-align:left; }
+  th.r,td.r,table.trades th.r,table.trades td.r { text-align:right; }
+  tbody tr:last-child td { border-bottom:0; }
+  tbody tr:hover td,table.trades tbody tr:hover td { background:rgba(145,164,255,.055); }
+  table.trades { min-width:560px; }
+  table.trades td { font-family:Bahnschrift, Consolas, 'Cascadia Mono', 'SF Mono', Menlo, monospace; font-variant-numeric:tabular-nums; }
+  body[data-report-kind="recommend"] table { min-width:900px; }
+  body[data-report-kind="recommend"] td:not(:last-child) { white-space:nowrap; }
+  body[data-report-kind="recommend"] td:nth-child(1),body[data-report-kind="recommend"] td:nth-child(2),
+  body[data-report-kind="recommend"] td:nth-child(n+4):not(:last-child) { font-family:Bahnschrift, Consolas, 'Cascadia Mono', 'SF Mono', Menlo, monospace; font-variant-numeric:tabular-nums; }
+  body[data-report-kind="recommend"] td:last-child { min-width:240px; max-width:470px; overflow-wrap:anywhere; }
+  body[data-report-kind="recommend"] td:first-child { color:var(--text-3); }
+  body[data-report-kind="recommend"] tbody tr:not(.risk):first-child td:first-child { color:var(--accent-strong); font-weight:700; }
+  tr.risk td { padding-top:0; font-size:12px; border-bottom:1px solid var(--border); }
+  .thermo { display:flex; height:8px; border-radius:6px; background:var(--surface-2); overflow:hidden; margin-bottom:12px; }
+  .thermo .seg-up { background:var(--up); }
+  .thermo .seg-down { background:var(--down); }
+  .tlegend,.stats { display:flex; gap:16px 25px; flex-wrap:wrap; font-size:12px; color:var(--text-2); margin-bottom:13px; }
+  .tlegend b { font-family:Bahnschrift, Consolas, 'Cascadia Mono', 'SF Mono', Menlo, monospace; font-variant-numeric:tabular-nums; font-size:15px; font-weight:500; margin-left:6px; }
+  .tlegend .lk-up { color:var(--up); }
+  .tlegend .lk-down { color:var(--down); }
+  .chip { display:inline-flex; align-items:baseline; gap:8px; padding:8px 12px; border-radius:10px; background:var(--bg-raise); border:1px solid var(--border); font-size:12px; margin:0 8px 0 0; }
+  .chip .ix-name { color:var(--text-3); }
+  .chip .ix-close { font-size:15px; font-weight:500; }
+  .state h2 { font-size:16px; color:var(--text); margin-bottom:12px; }
+  .state .stats { margin-top:13px; margin-bottom:0; }
+  .state-row { display:flex; align-items:center; gap:9px; font-size:16px; font-weight:650; margin-bottom:15px; }
+  .state-row .dot { width:7px; height:7px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 4px rgba(145,164,255,.1); }
+  .report-empty { text-align:center; color:var(--text-3); padding:28px 18px; }
+  footer,.note { color:var(--text-3); font-size:12px; text-align:center; margin-top:22px; padding-top:16px; border-top:1px solid var(--border); line-height:1.8; }
+  body[data-report-kind="backtest"] .wrap { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr); gap:14px; }
+  body[data-report-kind="backtest"] .wrap > * { grid-column:1 / -1; margin-bottom:0; }
+  body[data-report-kind="backtest"] .wrap > .eyebrow { margin-bottom:-9px; }
+  body[data-report-kind="backtest"] .wrap > h1 { margin-bottom:-8px; }
+  body[data-report-kind="backtest"] .wrap > .sub { margin-bottom:3px; }
+  body[data-report-kind="backtest"] .wrap > .report-equity { grid-column:1; }
+  body[data-report-kind="backtest"] .wrap > .report-drawdown { grid-column:2; display:flex; flex-direction:column; }
+  .report-drawdown .panel-head { flex-wrap:wrap; gap:4px 10px; }
+  .report-drawdown .panel-body { flex:1; display:flex; align-items:center; }
+  .report-drawdown svg { max-height:260px; }
+  .report-drawdown > svg { margin-top:auto; margin-bottom:auto; }
+  @media (min-width:1450px) { body { padding-left:40px; padding-right:40px; } }
+  @media (max-width:1100px) {
+    .grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    body[data-report-kind="backtest"] .wrap { grid-template-columns:minmax(0,1fr); }
+    body[data-report-kind="backtest"] .wrap > .report-equity,body[data-report-kind="backtest"] .wrap > .report-drawdown { grid-column:1; }
+    .report-drawdown svg { max-height:190px; }
+    .chip { margin-bottom:8px; }
+  }
+  @media (max-width:640px) {
+    body { padding:0 14px 24px; }
+    .report-tools { min-height:66px; gap:12px; }
+    .report-brand small,.report-action-secondary { display:none; }
+    .report-action { min-height:44px; }
+    .wrap { padding-top:20px; }
+    h1 { font-size:23px; }
+    .grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+    .metric,.card { padding:13px 14px; }
+    .metric-value,.card-value { font-size:24px; }
+    .panel-head { align-items:flex-start; flex-wrap:wrap; gap:4px; padding:12px 14px; }
+    .panel-body,.section,.state { padding:14px; }
+    .vs { gap:9px; }
+    .vs > span { width:100%; }
+    .chip { display:flex; width:100%; margin-right:0; justify-content:space-between; }
+    .chip:last-child { margin-bottom:0; }
+    .tlegend,.stats { gap:9px 17px; }
+  }
+  @media (prefers-reduced-motion:reduce) {
+    html { scroll-behavior:auto; }
+    *,*::before,*::after { transition:none!important; animation:none!important; }
+  }
+  @media print {
+    :root { color-scheme:light; --bg:#fff; --bg-raise:#f1f4f9; --surface:#fff; --surface-2:#f1f4f9; --border:#cdd5e3; --text:#16213a; --text-2:#384760; --text-3:#526079; --accent:#4d5aa9; --accent-strong:#414c92; --up:#b82341; --down:#127953; }
+    @page { size:A4 landscape; margin:12mm; }
+    body { background:#fff; color:var(--text); padding:0; font-size:11px; }
+    .report-tools { display:none; }
+    .wrap { padding:0; max-width:none; }
+    body[data-report-kind="backtest"] .wrap { display:block; }
+    body[data-report-kind="backtest"] .wrap > * { margin-bottom:12px; }
+    .grid { grid-template-columns:repeat(6,minmax(0,1fr)); }
+    .panel,.section,.state,.metric,.card,.tablewrap { box-shadow:none; background:#fff; break-inside:avoid; }
+    .tablewrap { break-inside:auto; }
+    .report-table-scroll { overflow:visible; }
+    table,table.trades,body[data-report-kind="recommend"] table { min-width:0; font-size:10px; }
+    th,td,table.trades th,table.trades td { padding:6px; }
+    body[data-report-kind="recommend"] td:last-child { min-width:0; }
+    tr { break-inside:avoid; }
+    thead { display:table-header-group; }
+    [style*="color:"] { color:var(--text-2)!important; }
+    .wrap svg { max-height:245px; }
+    svg text { fill:#526079; }
+    svg [stroke="#91a4ff"] { stroke:#4d5aa9; }
+    svg [stroke="#42d6a4"] { stroke:#127953; }
+    svg [stroke="#ff7f8c"] { stroke:#b82341; }
+    svg [stroke="#29364e"] { stroke:#cdd5e3; }
+    footer,.note { font-size:10px; }
+  }
+</style>
+</head>
+<body data-report-kind="recommend">
+<nav class="report-tools" id="report-top" aria-label="报告工具">
+  <div class="report-brand"><span class="report-brand-mark" aria-hidden="true">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18V6M4 18h16M8 14l4-5 4 3 4-7"/></svg>
+  </span>A 股投研<small>分析报告</small></div>
+  <div class="report-actions"><a class="report-action report-action-secondary" href="#report-top">返回顶部</a>
+    <button class="report-action report-action-primary" type="button" onclick="window.print()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 8V3h10v5M7 17H4V9h16v8h-3M7 14h10v7H7z"/></svg>打印报告
+    </button>
+  </div>
+</nav>
+<div class="wrap">
+  <div class="eyebrow">SCREENER REPORT</div>
+  <h1>智能选股推荐</h1>
+  <div class="sub">生成于 2026-09-08 19:31 · 共 10 只</div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>市场状态</h2><span class="hint">红为上涨家数 · 绿为下跌家数</span></div>
+    <div class="panel-body">
+      <div class="state-row"><span class="dot"></span>震荡市</div>
+      <div class="thermo">
+        <div class="seg-up" style="width:62.8%"></div>
+        <div class="seg-down" style="width:37.2%"></div>
+      </div>
+      <div class="tlegend">
+        <span class="lk-up">上涨<b>3417</b></span>
+        <span class="lk-down">下跌<b>2026</b></span>
+        <span>涨停<b>78</b></span>
+        <span>跌停<b>4</b></span>
+      </div>
+      <span class="chip"><span class="ix-name">上证指数</span><span class="mono ix-close">3940.55</span><span class="mono down">5日-1.0%</span></span><span class="chip"><span class="ix-name">深证成指</span><span class="mono ix-close">13703.21</span><span class="mono down">5日-1.2%</span></span><span class="chip"><span class="ix-name">创业板指</span><span class="mono ix-close">3359.72</span><span class="mono down">5日-1.0%</span></span>
+    </div>
+  </div>
+
+  <div class="tablewrap">
+  <div class="report-table-scroll" tabindex="0" role="region" aria-label="选股结果，可横向滚动"><table>
+    <thead><tr>
+      <th>排名</th><th>代码</th><th>名称</th><th class="r">现价</th><th class="r">涨跌幅</th><th class="r">PE</th><th class="r">综合得分</th><th style="text-align:left">推荐理由</th>
+    </tr></thead>
+    <tbody><tr>
+                <td class="mono">01</td>
+                <td class="mono" style="color:#91a1be">000703</td>
+                <td style="font-weight:600;white-space:nowrap">恒逸石化</td>
+                <td class="mono r">18.89</td>
+                <td class="mono r up">+6.78%</td>
+                <td class="mono r">12.2</td>
+                <td class="mono r" style="font-weight:650;color:#91a4ff">71.3</td>
+                <td style="text-align:left">均线趋势向上 + 技术信号形成确认 + 中期相对强势 + 估值处于可接受区间 + 波动与位置可控<br>
+                    <span style="color:#91a4ff;font-size:12px">入场 18.32 ~ 18.86 · 止损 16.6 · 目标 23.47</span><br>
+                    <span style="color:#e8b779;font-size:12px">风险提示：-</span></td>
+            </tr><tr>
+                <td class="mono">02</td>
+                <td class="mono" style="color:#91a1be">000783</td>
+                <td style="font-weight:600;white-space:nowrap">长江证券</td>
+                <td class="mono r">9.08</td>
+                <td class="mono r up">+0.22%</td>
+                <td class="mono r">9.8</td>
+                <td class="mono r" style="font-weight:650;color:#91a4ff">68.6</td>
+                <td style="text-align:left">均线趋势向上 + 技术信号形成确认 + 估值处于可接受区间 + 波动与位置可控<br>
+                    <span style="color:#91a4ff;font-size:12px">入场 8.92 ~ 9.16 · 止损 8.44 · 目标 10.36</span><br>
+                    <span style="color:#e8b779;font-size:12px">风险提示：动量偏弱</span></td>
+            </tr><tr>
+                <td class="mono">03</td>
+                <td class="mono" style="color:#91a1be">600368</td>
+                <td style="font-weight:600;white-space:nowrap">五洲交通</td>
+                <td class="mono r">4.37</td>
+                <td class="mono r up">+0.23%</td>
+                <td class="mono r">12.7</td>
+                <td class="mono r" style="font-weight:650;color:#91a4ff">66.2</td>
+                <td style="text-align:left">均线趋势向上 + 技术信号形成确认 + 估值处于可接受区间 + 波动与位置可控<br>
+                    <span style="color:#91a4ff;font-size:12px">入场 4.32 ~ 4.26 · 止损 4.18 · 目标 4.76</span><br>
+                    <span style="color:#e8b779;font-size:12px">风险提示：动量偏弱</span></td>
+            </tr><tr>
+                <td class="mono">04</td>
+                <td class="mono" style="color:#91a1be">000567</td>
+                <td style="font-weight:600;white-space:nowrap">海德股份</td>
+                <td class="mono r">6.7</td>
+                <td class="mono r up">+0.15%</td>
+                <td class="mono r">8.3</td>
+                <td class="mono r" style="font-weight:650;color:#91a4ff">65.8</td>
+                <td style="text-align:left">均线趋势向上 + 技术信号形成确认 + 估值处于可接受区间 + 波动与位置可控<br>
+                    <span style="color:#91a4ff;font-size:12px">入场 6.58 ~ 6.53 · 止损 6.22 · 目标 7.66</span><br>
+                    <span style="color:#e8b779;font-size:12px">风险提示：动量偏弱</span></td>
+            </tr><tr>
+                <td class="mono">05</td>
+                <td class="mono" style="color:#91a1be">603444</td>
+                <td style="font-weight:600;white-space:nowrap">吉比特</td>
+                <td class="mono r">402.87</td>
+                <td class="mono r down">-0.54%</td>
+                <td class="mono r">12.9</td>
+                <td class="mono r" style="font-weight:650;color:#91a4ff">65.4</td>
+                <td style="text-align:left">均线趋势向上 + 技术信号形成确认 + 估值处于可接受区间 + 波动与位置可控<br>
+                    <span style="color:#91a4ff;font-size:12px">入场 396.96 ~ 396.06 · 止损 379.21 · 目标 450.18</span><br>
+                    <span style="color:#e8b779;font-size:12px">风险提示：动量偏弱</span></td>
+            </tr><tr>
+                <td class="mono">06</td>
+                <td class="mono" style="color:#91a1be">601058</td>
+                <td style="font-weight:600;white-space:nowrap">赛轮轮胎</td>
+                <td class="mono r">14.59</td>
+                <td class="mono r up">+1.67%</td>
+                <td class="mono r">12.5</td>
+                <td class="mono r" style="font-weight:650;color:#91a4ff">64.7</td>
+                <td style="text-align:left">均线趋势向上 + 技术信号形成确认 + 估值处于可接受区间 + 波动与位置可控<br>
+                    <span style="color:#91a4ff;font-size:12px">入场 14.34 ~ 14.61 · 止损 13.58 · 目标 16.61</span><br>
+                    <span style="color:#e8b779;font-size:12px">风险提示：动量偏弱</span></td>
+            </tr><tr>
+                <td class="mono">07</td>
+                <td class="mono" style="color:#91a1be">002452</td>
+                <td style="font-weight:600;white-space:nowrap">长高电气</td>
+                <td class="mono r">12.19</td>
+                <td class="mono r down">-0.25%</td>
+                <td class="mono r">9.2</td>
+                <td class="mono r" style="font-weight:650;color:#91a4ff">64.3</td>
+                <td style="text-align:left">均线趋势向上 + 技术信号形成确认 + 估值处于可接受区间 + 波动与位置可控<br>
+                    <span style="color:#91a4ff;font-size:12px">入场 12.0 ~ 11.77 · 止损 11.45 · 目标 13.68</span><br>
+                    <span style="color:#e8b779;font-size:12px">风险提示：动量偏弱</span></td>
+            </tr><tr>
+                <td class="mono">08</td>
+                <td class="mono" style="color:#91a1be">002958</td>
+                <td style="font-weight:600;white-space:nowrap">青农商行</td>
+                <td class="mono r">3.03</td>
+                <td class="mono r up">+2.02%</td>
+                <td class="mono r">5.3</td>
+                <td class="mono r" style="font-weight:650;color:#91a4ff">63.7</td>
+                <td style="text-align:left">均线趋势向上 + 技术信号形成确认 + 估值处于可接受区间 + 波动与位置可控<br>
+                    <span style="color:#91a4ff;font-size:12px">入场 3.0 ~ 3.02 · 止损 2.9 · 目标 3.29</span><br>
+                    <span style="color:#e8b779;font-size:12px">风险提示：动量偏弱</span></td>
+            </tr><tr>
+                <td class="mono">09</td>
+                <td class="mono" style="color:#91a1be">600356</td>
+                <td style="font-weight:600;white-space:nowrap">恒丰纸业</td>
+                <td class="mono r">9.41</td>
+                <td class="mono r up">+3.07%</td>
+                <td class="mono r">14.4</td>
+                <td class="mono r" style="font-weight:650;color:#91a4ff">62.5</td>
+                <td style="text-align:left">均线趋势向上 + 技术信号形成确认 + 估值处于可接受区间 + 波动与位置可控<br>
+                    <span style="color:#91a4ff;font-size:12px">入场 9.41 ~ 9.55 · 止损 8.86 · 目标 10.5</span><br>
+                    <span style="color:#e8b779;font-size:12px">风险提示：动量偏弱</span></td>
+            </tr><tr>
+                <td class="mono">10</td>
+                <td class="mono" style="color:#91a1be">601233</td>
+                <td style="font-weight:600;white-space:nowrap">桐昆股份</td>
+                <td class="mono r">25.07</td>
+                <td class="mono r up">+0.60%</td>
+                <td class="mono r">11.6</td>
+                <td class="mono r" style="font-weight:650;color:#91a4ff">62.1</td>
+                <td style="text-align:left">均线趋势向上 + 估值处于可接受区间 + 波动与位置可控<br>
+                    <span style="color:#91a4ff;font-size:12px">入场 24.61 ~ 25.36 · 止损 22.54 · 目标 30.14</span><br>
+                    <span style="color:#e8b779;font-size:12px">风险提示：技术信号分歧、动量偏弱</span></td>
+            </tr></tbody>
+  </table></div>
+  </div>
+
+  <footer>
+    推荐结果由本地量化模型自动生成 · 2026-09-08 19:31<br>
+    仅供参考，不构成投资建议。股市有风险，入市需谨慎。
+  </footer>
+</div>
+</body>
+</html>

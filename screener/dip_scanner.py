@@ -9,7 +9,7 @@ import pandas as pd
 
 import config
 from data import fetcher
-from screener import filters, market_status
+from screener import filters, market_status, scorer, signals
 
 
 def _f(v):
@@ -50,13 +50,13 @@ def scan_dip(top_n=None, candidate_limit=None, verbose=True, progress=None,
 
     # 1. 大盘判断
     log("正在判断大盘状态...")
-    market = market_status.judge_market()
-    log(f"  => {market['state']}")
-
     # 2. 全市场扫描
     log("正在获取全市场行情快照...")
     spot = fetcher.get_all_spot()
     log(f"  => 共 {len(spot)} 只股票")
+
+    market = market_status.judge_market(spot=spot)
+    log(f"  => {market['state']}")
 
     # 3. 基础过滤
     log("正在过滤股票池（排除ST/停牌/涨跌停/流动性不足）...")
@@ -80,7 +80,7 @@ def scan_dip(top_n=None, candidate_limit=None, verbose=True, progress=None,
         try:
             df = fetcher.get_stock_daily(code, start_date=hist_start)
             r = _analyze(df, row, trend_ma, dip_days, dip_threshold,
-                         take_profit, stop_loss)
+                         take_profit, stop_loss, market=market)
             if r is not None:
                 results.append(r)
         except Exception as e:
@@ -97,7 +97,7 @@ def scan_dip(top_n=None, candidate_limit=None, verbose=True, progress=None,
     return {"market": market, "recommendations": results, "trend_ma": trend_ma}
 
 
-def _analyze(df, row, trend_ma, dip_days, dip_threshold, take_profit, stop_loss):
+def _analyze(df, row, trend_ma, dip_days, dip_threshold, take_profit, stop_loss, market=None):
     """分析单只股票是否满足超跌反弹条件，满足则返回结果 dict，否则返回 None"""
     if df is None or len(df) < trend_ma + 10:
         return None
@@ -107,13 +107,13 @@ def _analyze(df, row, trend_ma, dip_days, dip_threshold, take_profit, stop_loss)
     if price is None:
         price = float(close.iloc[-1])
 
-    # 1. 趋势向上：均线最新值 > 约5个交易日前（均线持续上行）
+    # 1. 趋势向上：均线最新值 > 约5个交易日前，且价格没有失守长期趋势线
     ma = close.rolling(trend_ma, min_periods=1).mean()
     if len(ma) < 10:
         return None
     ma_now = float(ma.iloc[-1])
     ma_prev = float(ma.iloc[-6])
-    if not ma_now > ma_prev:
+    if not ma_now > ma_prev or close.iloc[-1] < ma_now * .97:
         return None
 
     # 2. 短期超跌：近 dip_days 日累计跌幅 <= 阈值
@@ -134,7 +134,14 @@ def _analyze(df, row, trend_ma, dip_days, dip_threshold, take_profit, stop_loss)
     else:
         dip_score = 8.0    # 过深，趋势可能已破坏
 
-    score = 50.0 + trend_score + dip_score
+    sigs = signals.detect_signals(df)
+    features = scorer.features_from_history(df)
+    reversal = any(s["name"] in ("RSI超卖回升", "KDJ低位金叉", "布林带下轨反弹", "缩量回踩支撑") for s in sigs)
+    score = 50.0 + trend_score + dip_score + (10.0 if reversal else 0.0)
+    if not reversal:
+        risks.append("尚未出现明确反转确认，等待收盘确认")
+    if market and market.get("risk_level") == "high":
+        score *= .75
 
     # 4. 输出
     reasons = [
@@ -144,6 +151,13 @@ def _analyze(df, row, trend_ma, dip_days, dip_threshold, take_profit, stop_loss)
     risks = []
     if dip < -0.25:
         risks.append("短期跌幅过深，反弹可能只是反抽")
+    if market and market.get("risk_level") == "high":
+        risks.append("市场风险偏高，降低仓位并等待确认")
+    atr = features.get("atr") or price * .05
+    stop = max(0.01, price - 2 * atr)
+    target = price + 2 * (price - stop)
+    entry_low = max(stop + .25 * atr, price - .5 * atr)
+    entry_high = price + .25 * atr
 
     return {
         "code": str(row["code"]).zfill(6),
@@ -152,8 +166,13 @@ def _analyze(df, row, trend_ma, dip_days, dip_threshold, take_profit, stop_loss)
         "pct_chg": _f(row.get("pct_chg")),
         "dip_pct": round(dip * 100, 2),
         "trend": f"{trend_ma}日均线向上",
-        "take_profit": round(price * (1 + take_profit), 2),
-        "stop_loss": round(price * (1 - stop_loss), 2),
+        "take_profit": round(target, 2),
+        "stop_loss": round(stop, 2),
+        "entry_low": round(entry_low, 2),
+        "entry_high": round(entry_high, 2),
+        "entry_trigger": "超跌后出现反转确认",
+        "signal_valid_days": 2,
+        "atr_pct": round((atr / price) * 100, 2) if price else None,
         "score": round(score, 1),
         "reasons": reasons,
         "risks": risks,

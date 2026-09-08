@@ -165,7 +165,16 @@ def api_reports():
 
 @app.route("/reports/<path:filename>")
 def view_report(filename):
-    return send_from_directory(config.REPORT_DIR, filename)
+    response = send_from_directory(config.REPORT_DIR, filename, conditional=False)
+    if response.mimetype == "text/html":
+        response.direct_passthrough = False
+        html = response.get_data(as_text=True)
+        response.set_data(html_report.style_report_html(html))
+        # The presentation is applied when opened; archived source files stay intact.
+        response.headers.pop("ETag", None)
+        response.headers.pop("Last-Modified", None)
+        response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 if __name__ == "__main__":

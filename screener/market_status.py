@@ -8,7 +8,7 @@ from utils import indicators as ind
 from data import fetcher
 
 
-def judge_market():
+def judge_market(spot=None):
     """
     判断大盘状态
     :return: dict，包含状态、指数趋势、涨跌家数、热点等
@@ -20,6 +20,11 @@ def judge_market():
         "breadth": {},
         "hot_sectors": [],
         "summary": "",
+        "confidence": 0.0,
+        "risk_level": "unknown",
+        "risk_multiplier": 1.0,
+        "benchmark_return_60": None,
+        "as_of": None,
     }
 
     # 1. 指数趋势判断
@@ -31,10 +36,17 @@ def judge_market():
     bullish_count = 0
     bearish_count = 0
     index_details = []
+    index_last_dates = []
     for name, symbol in indices.items():
         try:
             df = fetcher.get_index_daily(symbol)
-            close = df["close"]
+            close = pd.to_numeric(df["close"], errors="coerce").dropna()
+            if len(close) < 65:
+                raise ValueError("指数历史数据不足")
+            if "date" in df.columns:
+                dates = pd.to_datetime(df["date"], errors="coerce").dropna()
+                if not dates.empty:
+                    index_last_dates.append(dates.max())
             ma5 = ind.ma(close, 5)
             ma10 = ind.ma(close, 10)
             ma20 = ind.ma(close, 20)
@@ -49,6 +61,8 @@ def judge_market():
                 bearish_count += 1
             # 近5日涨跌
             chg5 = (close.iloc[last] / close.iloc[-6] - 1) if len(close) > 6 else 0
+            if name == "上证指数" and len(close) > 61:
+                result["benchmark_return_60"] = round(float((close.iloc[-1] / close.iloc[-61] - 1) * 100), 2)
             index_details.append({
                 "name": name,
                 "close": round(float(close.iloc[last]), 2),
@@ -61,7 +75,10 @@ def judge_market():
 
     # 2. 市场宽度（涨跌家数）
     try:
-        spot = fetcher.get_all_spot()
+        if spot is None:
+            spot = fetcher.get_all_spot()
+        spot = spot.copy()
+        spot["pct_chg"] = pd.to_numeric(spot["pct_chg"], errors="coerce")
         up_count = int((spot["pct_chg"] > 0).sum())
         down_count = int((spot["pct_chg"] < 0).sum())
         flat_count = int((spot["pct_chg"] == 0).sum())
@@ -80,10 +97,13 @@ def judge_market():
         result["breadth"] = {"上涨": 0, "下跌": 0, "平盘": 0, "涨停": 0, "跌停": 0}
 
     # 3. 综合判断状态
-    if bullish_count >= 2:
+    breadth = result["breadth"]
+    breadth_total = breadth.get("上涨", 0) + breadth.get("下跌", 0)
+    breadth_ratio = (breadth.get("上涨", 0) / breadth_total) if breadth_total else 0.5
+    if bullish_count >= 2 and breadth_ratio >= 0.45:
         state = "牛市（偏多）"
         style = "aggressive"
-    elif bearish_count >= 2:
+    elif bearish_count >= 2 and breadth_ratio <= 0.55:
         state = "熊市（偏空）"
         style = "defensive"
     else:
@@ -91,6 +111,20 @@ def judge_market():
         style = "balanced"
     result["state"] = state
     result["style"] = style
+    trend_conf = abs(bullish_count - bearish_count) / max(1, len(indices))
+    breadth_conf = abs(breadth_ratio - 0.5) * 2
+    result["confidence"] = round(min(1.0, 0.55 * trend_conf + 0.45 * breadth_conf), 2)
+    if state.startswith("熊") or breadth_ratio < 0.35 or (breadth.get("跌停", 0) > breadth.get("涨停", 0) * 2):
+        result["risk_level"] = "high"
+        result["risk_multiplier"] = 0.6
+    elif state.startswith("牛") and breadth_ratio >= 0.55:
+        result["risk_level"] = "low"
+        result["risk_multiplier"] = 1.0
+    else:
+        result["risk_level"] = "medium"
+        result["risk_multiplier"] = 0.8
+    if index_last_dates:
+        result["as_of"] = max(index_last_dates).strftime("%Y-%m-%d")
 
     # 4. 生成摘要
     trend_txt = "、".join(
